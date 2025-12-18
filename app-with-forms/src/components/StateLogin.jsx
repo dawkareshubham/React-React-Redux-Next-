@@ -1,24 +1,34 @@
-import { useRef } from "react";
+import { useState } from "react";
 
 export default function Login() {
 
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
+  const [enteredValues, setEnteredValues] = useState({
+    email: '',
+    password: ''
+  });
+  
 
   function handleSubmit(event) {
     event.preventDefault();
     
-    const enteredEmail = emailInputRef.current.value;
-    const enteredPassword = passwordInputRef.current.value;
+    console.log(enteredValues);
 
-    console.log(enteredEmail, enteredPassword);
-  
     // reset form fields
-    // emailInputRef.current.value = '';
-    // passwordInputRef.current.value = '';
+    // setEnteredValues({
+    //   email: '',
+    //   password: ''
+    // });
+
   }
 
- return (
+  function handleInputChange(identifier, event) {
+    setEnteredValues((prevValues) => ({
+      ...prevValues,
+      [identifier]: event.target.value
+    }));
+  }
+
+  return (
     <form onSubmit={handleSubmit}>
       <h2>Login</h2>
 
@@ -29,7 +39,8 @@ export default function Login() {
             id="email"
             type="email"
             name="email"
-            ref={emailInputRef}/>
+            value={enteredValues.email}
+            onChange={(event) => handleInputChange('email', event)}/>
         </div>
 
         <div className="control no-margin">
@@ -38,7 +49,8 @@ export default function Login() {
             id="password"
             type="password"
             name="password"
-            ref={passwordInputRef}/>
+            value={enteredValues.password}
+            onChange={(event) => handleInputChange('password', event)}/>
         </div>
       </div>
 
