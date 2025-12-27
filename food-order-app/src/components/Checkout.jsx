@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext, useActionState } from 'react'
 import Modal from './UI/Modal'
 import CartContext from '../store/cartContext'
 import { currencyFormatter } from '../util/formatting';
@@ -20,7 +20,7 @@ export default function Checkout() {
   const cartCtx = useContext(CartContext);
   const userProgressCtx = useContext(UserProgressContext);
 
-  const { data, isLoading: isSending, error, sendRequest, clearData } = useHttp('http://localhost:3000/orders', requestConfig);
+  const { data, error, sendRequest, clearData } = useHttp('http://localhost:3000/orders', requestConfig);
 
   const totalPrice = cartCtx.items.reduce(
     (acc, item) => acc + item.price * item.quantity,
@@ -37,25 +37,18 @@ export default function Checkout() {
     clearData();
   }
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  async function checkoutAction(prevState, formData) {
+    const userData = Object.fromEntries(formData.entries());
 
-    const formData = new FormData(event.target);
-    const userData = {
-      name: formData.get('full-name'),
-      email: formData.get('email'),
-      street: formData.get('street'),
-      "postal-code": formData.get('postal-code'),
-      city: formData.get('city'),
-    };
-
-    sendRequest(JSON.stringify({
+    await sendRequest(JSON.stringify({
       order: {
         customer: userData,
         items: cartCtx.items
       }
     }));
   }
+
+  const [ formState, formAction, isSending ] = useActionState(checkoutAction, null)
 
   let actions = (<>
     <Button type="button" textOnly onClick={handleCloseCheckout}>Close</Button>
@@ -78,11 +71,11 @@ export default function Checkout() {
   
   return (
     <Modal open={userProgressCtx.progress === 'checkout'} onClose={handleCloseCheckout}>
-      <form onSubmit={handleSubmit}>
+      <form action={formAction}>
         <h2>Checkout</h2>
         <p>Total Amount: {currencyFormatter.format(totalPrice)}</p>
       
-        <Input label="Full Name" type="text" id="full-name" />
+        <Input label="Full Name" type="text" id="name" />
         <Input label="Email" type="email" id="email" />
         <Input label="Street" type="text" id="street" />
         <div className='control-row'>
