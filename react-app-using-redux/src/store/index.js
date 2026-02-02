@@ -1,32 +1,13 @@
 // import { createStore } from 'redux';
-import { configureStore, createSlice } from '@reduxjs/toolkit';
+import { configureStore } from '@reduxjs/toolkit';
 
-const initialState = { counter: 0, showCounter: true };
-
-const counterSlice = createSlice({
-    name: 'counter',
-    initialState,
-    reducers: {
-        increment(state) {
-            state.counter++;
-        },
-        increase(state, action) {
-            state.counter += action.payload; // payload is default property name in RTK
-        },
-        decrement(state) {
-            state.counter--;
-        },
-        toggle(state) {
-            state.showCounter = !state.showCounter;
-        }
-    }
-});
+import counterReducer from './counter.js';
+import authReducer from './auth.js';
 
 const store = configureStore({
-    reducer: counterSlice.reducer
+    reducer: { counter: counterReducer, auth: authReducer }
 });
 
-export const counterActions = counterSlice.actions;
 
 // const counterReducer = (state = initialState, action) => {
 //     if (action.type === 'increment') {
